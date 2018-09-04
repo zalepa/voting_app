@@ -7,12 +7,18 @@ class ProductList extends React.Component {
   componentDidMount() {
     this.setState({ products: Seed.products });
   }
-
-  handleProductUpVote = (productId) => {
+  
+  handleVote = (productId, type) => {
     const nextProducts = this.state.products.map((product) => {
       if (product.id === productId) {
+        let newVotes = 0;
+        if (type === 'up') {
+           newVotes = product.votes + 1;
+        } else if (type === 'down') {
+          newVotes = product.votes - 1;
+        }
         return Object.assign({}, product, {
-          votes: product.votes + 1,
+          votes: newVotes,
         });
       } else {
         return product;
@@ -38,7 +44,7 @@ class ProductList extends React.Component {
         votes={product.votes}
         submitterAvatarUrl={product.submitterAvatarUrl}
         productImageUrl={product.productImageUrl}
-        onVote={this.handleProductUpVote}
+        onVote={this.handleVote}
       />
     ))
 
@@ -51,9 +57,6 @@ class ProductList extends React.Component {
 }
 
 class Product extends React.Component {
-  handleUpVote = () => {
-    this.props.onVote(this.props.id)
-  }
 
   render() {
     return (
@@ -63,10 +66,13 @@ class Product extends React.Component {
           </div>
           <div className="middle aligned content">
             <div className="header">
-              <a onClick={this.handleUpVote}>
+              <a onClick={() => this.props.onVote(this.props.id, 'up')}>
                 <i className="large caret up icon" />
               </a>
               {this.props.votes}
+              <a onClick={() => this.props.onVote(this.props.id, 'down')}>
+                <i className="large caret down icon" />
+              </a>
             </div>
             <div className="description">
               <a href={this.props.url}>{this.props.title}</a>
